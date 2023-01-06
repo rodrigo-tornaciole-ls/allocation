@@ -1,17 +1,16 @@
-import { DataGrid, GridColDef, GridRowParams, GridRowId, GridColumns, GridActionsCellItem, GridCellModes, GridCellModesModel, GridEventListener } from "@mui/x-data-grid";
+import { DataGrid, GridColumns, GridActionsCellItem, GridRowId, GridCellModesModel, GridEventListener } from "@mui/x-data-grid";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import SaveIcon from '@mui/icons-material/Save';
-import ClearIcon from '@mui/icons-material/Clear'; 
 import * as React from 'react';
 import deleteDeveloper from "../../pages/api/developers/delete";
-import editDeveloper from "../../pages/api/developers/edit";
 import { Button } from "@mui/material";
 import { Box } from "@mui/system";
+import { useRouter } from 'next/router';
 
 interface IGridPros {
     initialColumns: string[][];
     initialRows:  {}[];
+    action: string;
 }
 
 interface SelectedCellParams {
@@ -25,47 +24,28 @@ interface SelectedCellParams {
     cellModesModel: GridCellModesModel;
     setCellModesModel: (value: GridCellModesModel) => void;
     cellMode: 'view' | 'edit';
+    selectedAction: string;
   }
 
 let  rowIdEdit: string;
 
 function EditToolbar(props: EditToolbarProps) {
-    // Handle button Edit/Save and Cancel
-    const { selectedCellParams, cellMode, cellModesModel, setCellModesModel } = props;
-    
+    // Handle button Edit
+    const { selectedCellParams, cellMode, selectedAction } = props;
+    const router = useRouter()
     const handleSaveOrEdit = () => {
         if (!selectedCellParams) {
             return;
         }
-        const { id, field, value} = selectedCellParams;
-        if (cellMode === 'edit') {
-            setCellModesModel({
-                ...cellModesModel,
-                [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.View } },
-            });
-            const _id = rowIdEdit;
-            editDeveloper(_id, {[field]: value})
-            rowIdEdit = "";
-        } else {
-            setCellModesModel({
-                ...cellModesModel,
-                [id]: { ...cellModesModel[id], [field]: { mode: GridCellModes.Edit } },
-            });
+        
+        if (cellMode !== 'edit') {
+            router.push({
+                pathname: '/[action]/edit/[pid]',
+                query: { 
+                    action:selectedAction,
+                    pid: rowIdEdit },
+              })
         }
-    };
-
-    const handleCancel = () => {
-        if (!selectedCellParams) {
-        return;
-        }
-        const { id, field } = selectedCellParams;
-        setCellModesModel({
-        ...cellModesModel,
-        [id]: {
-            ...cellModesModel[id],
-            [field]: { mode: GridCellModes.View, ignoreModifications: true },
-        },
-        });
     };
 
     const handleMouseDown = (event: React.MouseEvent) => {
@@ -87,30 +67,23 @@ function EditToolbar(props: EditToolbarProps) {
                 disabled={!selectedCellParams}
                 variant="text"
             >
-                {cellMode === 'edit' ? <SaveIcon /> : <EditIcon />}
-            </Button>
-            <Button
-                onClick={handleCancel}
-                onMouseDown={handleMouseDown}
-                disabled={cellMode === 'view'}
-                variant="text"
-                sx={{ ml: 1 }}
-            >
-                <ClearIcon />
+                <EditIcon />
             </Button>
         </Box>
     )
 }
 
-export default function GridTable({initialColumns, initialRows}: IGridPros) {
+export default function GridTable({initialColumns, initialRows, action}: IGridPros) {
     const [rows, setRows] =  React.useState(initialRows);
     const [onLoad, setLoad] = React.useState(false);
+    const [selectedAction, setSelectedAction] = React.useState(action)
 
     /** Load First Data */
     React.useEffect(() => {
         if(!onLoad && initialRows.length > 0){
             setRows(initialRows);
             setLoad(true);
+            setSelectedAction(action);
         }
     });
 
@@ -139,17 +112,6 @@ export default function GridTable({initialColumns, initialRows}: IGridPros) {
         },
         [],
     );
-
-    const handleCellOnChange = React.useCallback(
-        (event: React.ChangeEvent<HTMLDivElement>) => {
-            const row = event.currentTarget.parentElement;
-            const id = row!.dataset.id!;
-            const field = event.currentTarget.dataset.field!;
-            const value = event.target.value;
-            setSelectedCellParams({ id, field, value});
-        },
-        [],
-    );
     
     const cellMode = React.useMemo(() => {
         if (!selectedCellParams) {
@@ -159,20 +121,15 @@ export default function GridTable({initialColumns, initialRows}: IGridPros) {
         return cellModesModel[id]?.[field]?.mode || 'view';
     }, [cellModesModel, selectedCellParams]);
 
-    const handleCellKeyDown = React.useCallback<GridEventListener<'cellKeyDown'>>(
-        (params, event) => {
-            if (cellMode === 'edit') {
-                // Prevents calling event.preventDefault() if Tab is pressed on a cell in edit mode
-                event.defaultMuiPrevented = true;
-                rowIdEdit = params.row._id;
-            }
-        },
-        [cellMode],
+    const handleCellClick = React.useCallback<GridEventListener<'cellClick'>>(
+        (params) => {
+            rowIdEdit = params.row._id;
+        },[]
     );
     
     /** Seed Columns and Rows */
-    let gridColumns = initialColumns.map((column: string[], index: number) => {
-        return {field: column[0], headerName: column[1], width: 150, editable: true, getActions: (params: any) => {} }
+    let gridColumns = initialColumns.map((column: string[]) => {
+        return {field: column[0], headerName: column[1], width: 150, editable: false, getActions: (params: any) => {} }
     });
 
     gridColumns = [...gridColumns, 
@@ -193,7 +150,7 @@ export default function GridTable({initialColumns, initialRows}: IGridPros) {
     return (
         <div style={{ height: 300, width: '100%' }}>
             <DataGrid rows={rows} columns={columns} pageSize={5} rowsPerPageOptions={[5]} 
-            onCellKeyDown={handleCellKeyDown}
+            onCellClick={handleCellClick}
             cellModesModel={cellModesModel}
             onCellModesModelChange={(model) => setCellModesModel(model)}
             components={{
@@ -206,10 +163,10 @@ export default function GridTable({initialColumns, initialRows}: IGridPros) {
                   setSelectedCellParams,
                   cellModesModel,
                   setCellModesModel,
+                  selectedAction,
                 },
                 cell: {
                   onFocus: handleCellFocus,
-                  onChange: handleCellOnChange,
                 },
               }}
               experimentalFeatures={{ newEditingApi: true }}
