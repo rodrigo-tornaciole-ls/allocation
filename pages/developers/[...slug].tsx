@@ -18,15 +18,16 @@ export default function DevelopersForm() {
     ];
     const [openError, setErrorShow] = useState(false);
     const handleErrorShow = () => setErrorShow(true);
+    const handleErrorClose = () => setErrorShow(false);
     const [errorMessage, setErrorMessage] = useState("");
-    const [rows, setRows] = useState();
+    const [data, setData] = useState();
     const [action, setAction] = useState("");
 
     const router = useRouter();
 
-    if(router.query?.slug && !rows){
+    if(router.query?.slug && !data){
         getDeveloper(router.query?.slug[1]).then((result) => {
-            setRows(result);      
+            setData(result);      
             setAction(router.query?.slug[0])                                                                                                                                                                       
         });
         
@@ -39,28 +40,25 @@ export default function DevelopersForm() {
             email: event.target.email.value,
             availability: event.target.availability.value
         }
-        if(action!="edit"){
-            postDevelopers(data).then((developer: {_id?: string, name?:string, email?:string, message?:string}) => {
-                if(!developer._id){
-                    handleErrorShow();
-                    setErrorMessage(developer.message);
-                }else{
-                    // const index = rows.length + 1;
-                    // setRows([...rows, {id: index, _id: developer._id, name: developer.name, email: developer.email}]);
-                }
-            })
-        }else{
+        if(action=="edit"){
             editDeveloper(router.query?.slug[1], data).then((developer: {_id?: string, name?:string, email?:string, message?:string}) => {
                 if(!developer._id){
                     handleErrorShow();
                     setErrorMessage(developer.message);
                 }else{
-                    // const index = rows.length + 1;
-                    // setRows([...rows, {id: index, _id: developer._id, name: developer.name, email: developer.email}]);
+                    router.push(`/developers`)
+                }
+            })
+        }else{
+            postDevelopers(data).then((developer: {_id?: string, name?:string, email?:string, message?:string}) => {
+                if(!developer._id){
+                    handleErrorShow();
+                    setErrorMessage(developer.message);
+                }else{
+                    router.push(`/developers`)
                 }
             })
         }
-        router.push(`/developers`)
     }
 
     return (
@@ -86,7 +84,12 @@ export default function DevelopersForm() {
                     Developers
                 </h1>
 
-                <AddDeveloperForm availabilities={availabilities} onSubmit={handleSubmit} key={router.asPath} data={rows} action={action} />
+                <AddDeveloperForm availabilities={availabilities} onSubmit={handleSubmit} key={router.asPath} data={data} action={action} />
+                <Snackbar open={openError} autoHideDuration={6000} onClose={handleErrorClose}>
+                    <Alert onClose={handleErrorClose} severity="error" sx={{ width: '100%' }}>
+                        {errorMessage}
+                    </Alert>
+                </Snackbar>
             </main>
         </div>
     );
