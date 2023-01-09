@@ -27,7 +27,7 @@ export default function Developers() {
         });
     },[]);
 
-    const router = useRouter()
+    const router = useRouter();
 
     return (
         <div className={stylesHome.container}>
