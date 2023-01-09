@@ -33,7 +33,7 @@ export default function Home() {
           </a>
 
           <a
-            href="#"
+            href="/appointments"
             className={styles.card}
           >
             <h2>Appointments &rarr;</h2>
