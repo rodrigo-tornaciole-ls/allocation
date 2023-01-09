@@ -1,33 +1,19 @@
 import Head from 'next/head';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import stylesHome from '../../styles/Home.module.css'
-import { Alert, Box, Breadcrumbs, Modal, Snackbar, Typography } from '@mui/material';
+import { Breadcrumbs, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import AddButton from '../../components/button/add';
 import DomainAddRoundedIcon from '@mui/icons-material/DomainAddRounded';
 import GridTable from '../../components/grid'
 import getProjects from '../api/projects';
-import AddProjectsForm from '../../components/forms/projects.add';
-import postProjects from '../api/projects/posts';
 
 export default function Projects() {
 
     const columns = [["id","ID"], ["name","Name"], ["tag","Tag"]];
     const [rows, setRows] = useState([]);
     const [isLoading, setLoading] = useState(false);
-    const availabilities = [
-        "Full",
-        "PartTime",
-        "SixHour",
-        "Other"
-    ];
-    const [openModal, setModalShow] = useState(false);
-    const handleModalShow = () => setModalShow(true);
-    const handleModalClose = () => setModalShow(false);
-    const [openError, setErrorShow] = useState(false);
-    const handleErrorShow = () => setErrorShow(true);
-    const handleErrorClose = () => setErrorShow(false);
-    const [errorMessage, setErrorMessage] = useState("");
 
     /** List projects to fill the Grid Table */
     useEffect(() => {
@@ -41,31 +27,8 @@ export default function Projects() {
         });
     },[]);
     
-    const handleSubmit = async (event: any) => {
-        event.preventDefault();
-        const data = {
-            name: event.target.name.value,
-            tag: event.target.tag.value,
-        }
-        postProjects(data).then((project: {_id?: string, name?:string, tag?:string, message?:string}) => {
-            if(!project._id){
-                handleErrorShow();
-                setErrorMessage(project.message);
-            }else{
-                const index = rows.length + 1;
-                setRows([...rows, {id: index, _id: project._id, name: project.name, tag: project.tag}]);
-                handleModalClose();
-            }
-        })
-    }
-
-    /** show/hide create user form */
-    const handelAddProject = async (event: any) => {
-        event.preventDefault();
-        // setAddproject(!addproject);
-        handleModalShow();
-    }
-
+    const router = useRouter();
+    
     return (
         <div className={stylesHome.container}>
             <Head>
@@ -89,31 +52,12 @@ export default function Projects() {
 
                 {/* Block Add Project */}
                 <div style={{padding:"5vh"}}>
-                    <AddButton endIcon={<DomainAddRoundedIcon/>} label="Project" onClick={handelAddProject} />
+                    <AddButton endIcon={<DomainAddRoundedIcon/>} label="Project" onClick={() => router.push('/projects/create')} />
                 </div>
-                <Modal open={openModal} onClose={handleModalClose} aria-labellesdby="parent-modal-title" aria-describedby="parent-modal-description">
-                    <Box sx={{
-                        bgcolor: 'background.paper',
-                        boxShadow: 1,
-                        borderRadius: 2,
-                        p: 2,
-                        minWidth: '50vh',
-                        width:'100vh',
-                        mx: 'auto',
-                        my: '15%',
-                    }}>
-                        <AddProjectsForm availabilities={availabilities} onSubmit={handleSubmit} />
-                    </Box>
-                </Modal>
-                <Snackbar open={openError} autoHideDuration={6000} onClose={handleErrorClose}>
-                    <Alert onClose={handleErrorClose} severity="error" sx={{ width: '100%' }}>
-                        {errorMessage}
-                    </Alert>
-                </Snackbar>
                 {/* End Block Add Project */}
 
                 {/* Block List Projects */}
-                <GridTable initialColumns={columns} initialRows={rows} />
+                <GridTable initialColumns={columns} initialRows={rows} action='projects' />
                 {/* End Block List Projects */}
             </main>
         </div>

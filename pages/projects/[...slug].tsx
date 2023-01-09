@@ -2,20 +2,14 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import AddDeveloperForm from "../../components/forms/developer.add"
-import postDevelopers from '../api/developers/posts';
-import editDeveloper from "../../pages/api/developers/edit";
+import AddProjectForm from '../../components/forms/project.add';
+import postProjects from '../api/projects/posts';
+import editProject from '../api/projects/edit';
 import stylesHome from '../../styles/Home.module.css';
 import { Alert, Breadcrumbs, Snackbar, Typography } from '@mui/material';
-import getDeveloper from '../api/developers/[pid]';
+import getProject from '../api/projects/[pid]';
 
-export default function DevelopersForm() {
-    const availabilities = [
-        "Full",
-        "PartTime",
-        "SixHour",
-        "Other"
-    ];
+export default function ProjectsForm() {
     const [openError, setErrorShow] = useState(false);
     const handleErrorShow = () => setErrorShow(true);
     const handleErrorClose = () => setErrorShow(false);
@@ -26,7 +20,7 @@ export default function DevelopersForm() {
     const router = useRouter();
 
     if(router.query?.slug && !data){
-        getDeveloper(router.query?.slug[1]).then((result) => {
+        getProject(router.query?.slug[1]).then((result) => {
             setData(result);      
             setAction(router.query?.slug[0])                                                                                                                                                                       
         });
@@ -37,25 +31,24 @@ export default function DevelopersForm() {
         event.preventDefault();
         const data = {
             name: event.target.name.value,
-            email: event.target.email.value,
-            availability: event.target.availability.value
+            tag: event.target.tag.value
         }
         if(action=="edit"){
-            editDeveloper(router.query?.slug[1], data).then((developer: {_id?: string, message?:string}) => {
-                if(!developer._id){
+            editProject(router.query?.slug[1], data).then((project: {_id?: string, message?:string}) => {
+                if(!project._id){
                     handleErrorShow();
-                    setErrorMessage(developer.message);
+                    setErrorMessage(project.message);
                 }else{
-                    router.push(`/developers`)
+                    router.push(`/projects`)
                 }
             })
         }else{
-            postDevelopers(data).then((developer: {_id?: string, message?:string}) => {
-                if(!developer._id){
+            postProjects(data).then((project: {_id?: string, message?:string}) => {
+                if(!project._id){
                     handleErrorShow();
-                    setErrorMessage(developer.message);
+                    setErrorMessage(project.message);
                 }else{
-                    router.push(`/developers`)
+                    router.push(`/projects`)
                 }
             })
         }
@@ -64,8 +57,8 @@ export default function DevelopersForm() {
     return (
         <div className={stylesHome.container}>
             <Head>
-                <title>Allocation - Developers</title>
-                <meta name="description" content="Management of Developers" />
+                <title>Allocation - Projects</title>
+                <meta name="description" content="Management of Projects" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
         
@@ -75,17 +68,17 @@ export default function DevelopersForm() {
                     <Link underline="hover" color="inherit" href="/">
                         Home
                     </Link>
-                    <Link underline="hover" color="inherit" href="/developers">
-                        Developers
+                    <Link underline="hover" color="inherit" href="/projects">
+                        Projects
                     </Link>
                     {action === "edit" ? <Typography color="text.primary">Edit</Typography> :
                     <Typography color="text.primary">Create</Typography> }
                 </Breadcrumbs>
                 <h1 className={stylesHome.title}>
-                    Developers
+                    Projects
                 </h1>
 
-                <AddDeveloperForm availabilities={availabilities} onSubmit={handleSubmit} key={router.asPath} data={data} action={action} />
+                <AddProjectForm onSubmit={handleSubmit} key={router.asPath} data={data} action={action} />
                 <Snackbar open={openError} autoHideDuration={6000} onClose={handleErrorClose}>
                     <Alert onClose={handleErrorClose} severity="error" sx={{ width: '100%' }}>
                         {errorMessage}

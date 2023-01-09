@@ -16,6 +16,6 @@ export default async function postProjects(data: IPostProjects) {
 
         return await response.json();
     }catch(e){
-        return {message: "Not possible to create Developer"}
+        return {message: "Not possible to create Project"}
     }
 }

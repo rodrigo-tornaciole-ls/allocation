@@ -3,6 +3,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import * as React from 'react';
 import deleteDeveloper from "../../pages/api/developers/delete";
+import deleteProjects from "../../pages/api/projects/delete";
 import { Button } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from 'next/router';
@@ -92,7 +93,11 @@ export default function GridTable({initialColumns, initialRows, action}: IGridPr
         (id: GridRowId, _id:string) => async () => {
           setTimeout(async () => {
             setRows((prevRows) => prevRows.filter((row) => row.id !== id));
-            await deleteDeveloper(_id);
+            if(action==="developers"){
+                await deleteDeveloper(_id);
+            }else if(action==="projects"){
+                await deleteProjects(_id);
+            }
           });
         },
         [],
