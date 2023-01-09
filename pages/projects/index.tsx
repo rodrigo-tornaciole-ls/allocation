@@ -12,7 +12,7 @@ import postProjects from '../api/projects/posts';
 
 export default function Projects() {
 
-    const columns = [["id","ID"], ["name","Name"], ["email","E-mail"]];
+    const columns = [["id","ID"], ["name","Name"], ["tag","Tag"]];
     const [rows, setRows] = useState([]);
     const [isLoading, setLoading] = useState(false);
     const availabilities = [
@@ -31,13 +31,13 @@ export default function Projects() {
 
     /** List projects to fill the Grid Table */
     useEffect(() => {
-        setLoading(true) 
+        setLoading(true);
         getProjects().then((result) => {
             const projectsList = result.map((project:{_id: string, name: string, tag:string}, index: number) => {
                 return {id: index+1, _id: project._id, name: project.name, tag: project.tag}
-            })
+            });
             setRows(projectsList);
-            setLoading(false)                                                                                                                                                                                                                    
+            setLoading(false);
         });
     },[]);
     
@@ -45,8 +45,7 @@ export default function Projects() {
         event.preventDefault();
         const data = {
             name: event.target.name.value,
-            email: event.target.email.value,
-            availability: event.target.availability.value
+            tag: event.target.tag.value,
         }
         postProjects(data).then((project: {_id?: string, name?:string, tag?:string, message?:string}) => {
             if(!project._id){
@@ -55,6 +54,7 @@ export default function Projects() {
             }else{
                 const index = rows.length + 1;
                 setRows([...rows, {id: index, _id: project._id, name: project.name, tag: project.tag}]);
+                handleModalClose();
             }
         })
     }
