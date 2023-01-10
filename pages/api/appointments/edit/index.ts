@@ -1,6 +1,17 @@
-import { IEditDevelopers } from "../interface/edit.developers.interface";
+import { IEditDevelopers } from "../../developers/interface/edit.developers.interface";
+import { IEditProjects } from "../../projects/interface/edit.projects.interface";
 
-export default async function editDeveloper(id: string, data: IEditDevelopers) {
+interface IEditAppointments {
+    weakOfYear?: string;
+    year?: string;
+    user?: IEditDevelopers;
+    project?: IEditProjects;
+    status?: string;
+    availability?: string;
+    otherAvailability?: string;
+}
+
+export default async function editAppointment(id: string, data: IEditAppointments) {
     try{
         const response = await fetch(`${ process.env.NEXT_PUBLIC_API_HOST }v1/users/${id}`, {
             method: "PATCH",

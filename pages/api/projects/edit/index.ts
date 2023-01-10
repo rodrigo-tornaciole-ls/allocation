@@ -1,7 +1,4 @@
-interface IEditProjects {
-    name?: string;
-    tag?: string;
-}
+import { IEditProjects } from "../interface/edit.projects.interface";
 
 export default async function editProject(id: string, data: IEditProjects) {
     try{

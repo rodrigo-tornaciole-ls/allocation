@@ -3,12 +3,10 @@ import AddButton from '../button/add';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import EditIcon from '@mui/icons-material/Edit';
 import { useEffect, useState } from 'react';
+import { availabilities } from '../../enum/availabilities.enum';
 
-interface IFormProps {
-    availabilities: string[];
-}
 
-export default function AddDeveloperForm({availabilities, ...props}: IFormProps) {
+export default function AddDeveloperForm({...props}) {
     const {data, action} = props;
     const [name, setName] = useState("")
     const [email, setEmail] = useState("")

@@ -1,7 +1,4 @@
-interface IPostProjects {
-    name: string;
-    tag: string;
-}
+import { IPostProjects } from "../interface/posts.projects.interface";
 
 export default async function postProjects(data: IPostProjects) {
     try{

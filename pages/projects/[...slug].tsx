@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import AddProjectForm from '../../components/forms/project.add';
+import AddProjectForm from '../../components/forms/project';
 import postProjects from '../api/projects/posts';
 import editProject from '../api/projects/edit';
 import stylesHome from '../../styles/Home.module.css';

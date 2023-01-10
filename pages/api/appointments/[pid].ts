@@ -1,7 +1,7 @@
-export default async function getDeveloper(id:string|undefined) {
+export default async function getAppointment(id:string|undefined) {
     try{
         if(id !== undefined){
-            const response = await fetch(`${ process.env.NEXT_PUBLIC_API_HOST }v1/users/${id}`, {
+            const response = await fetch(`${ process.env.NEXT_PUBLIC_API_HOST }v1/appointments/${id}`, {
                 method: "GET",
                 headers: {
                     'content-type': 'application/json',

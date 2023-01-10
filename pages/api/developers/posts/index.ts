@@ -1,8 +1,4 @@
-interface IPostDevelopers {
-    name: string;
-    email: string;
-    availability: string;
-}
+import { IPostDevelopers } from "../interface/posts.developers.interface";
 
 export default async function postDevelopers(data: IPostDevelopers) {
     try{
