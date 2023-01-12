@@ -13,7 +13,7 @@ interface IEditAppointments {
 
 export default async function editAppointment(id: string, data: IEditAppointments) {
     try{
-        const response = await fetch(`${ process.env.NEXT_PUBLIC_API_HOST }v1/users/${id}`, {
+        const response = await fetch(`${ process.env.NEXT_PUBLIC_API_HOST }v1/appointments/${id}`, {
             method: "PATCH",
             headers: {
                 'content-type': 'application/json',
@@ -24,6 +24,6 @@ export default async function editAppointment(id: string, data: IEditAppointment
 
         return await response.json();
     }catch(e){
-        return {message: "Not possible to edit Developer"}
+        return {message: "Not possible to edit Appointment"}
     }
 }

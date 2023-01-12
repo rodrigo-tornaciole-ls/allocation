@@ -1,4 +1,4 @@
-import { FormControl, Grid, InputLabel, NativeSelect, TextField } from '@mui/material';
+import { FormControl, Grid, InputLabel, NativeSelect, TextField, Hidden } from '@mui/material';
 import AddButton from '../button/add';
 import AddBoxRoundedIcon from '@mui/icons-material/AddBoxRounded';
 import EditIcon from '@mui/icons-material/Edit';
@@ -11,6 +11,7 @@ import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
+var weekOfYear = require('dayjs/plugin/weekOfYear');
 
 export default function AddAppointmentForm({...props}) {
     
@@ -24,8 +25,8 @@ export default function AddAppointmentForm({...props}) {
     const [projectsLoaded, setProjectsLoaded] = useState(false)
 
     useEffect(() => {
-        if(data?.date && data?.year && !loaded){
-            setDate(data?.date);
+        if(data?.date && !loaded){
+            setDate(dayjs(data?.date.split('T')[0]));
             if(date)
                 setLoaded(true)
         }
@@ -62,21 +63,9 @@ export default function AddAppointmentForm({...props}) {
     return (
         <form {...props} style={{padding:"0 50px 50px 50px"}}>
             <Grid container spacing={2}>
-                {/* <Grid item xs={12} md={12}>
-                    <TextField id="weekOfYear" name="weekOfYear" label="Week Of Year" value={weekOfYear} onChange={(event) => setWeekOfYear(event.target.value)} fullWidth variant="standard" required />
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <MobileDatePicker name="weekOfYear" label="Week Of Year" inputFormat="DD/MM/YYYY" value={weekOfYear} onChange={handleWeekOfYearChange} renderInput={(params) => <TextField {...params} fullWidth variant="standard" required />} />
-                    </LocalizationProvider>
-                </Grid>
                 <Grid item xs={12} md={12}>
-                    <TextField id="year" name="year" label="Year" value={year} onChange={(event) => setYear(event.target.value)} fullWidth variant="standard" required />
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <MobileDatePicker name="year" label="Year" inputFormat="DD/MM/YYYY" value={year} onChange={handleYearChange} renderInput={(params) => <TextField {...params} fullWidth variant="standard" required />} />
-                    </LocalizationProvider>
-                </Grid> */}
-                <Grid item xs={12} md={12}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                        <MobileDatePicker name="date" label="Date" inputFormat="DD/MM/YYYY" value={date} onChange={handleDateChange} renderInput={(params) => <TextField {...params} fullWidth variant="standard" required />} />
+                        <MobileDatePicker label="Date" inputFormat="YYYY-MM-DD" value={date} onChange={handleDateChange} renderInput={(params) => <TextField {...params} fullWidth name="date" variant="standard" required />} />
                     </LocalizationProvider>
                 </Grid>
                 <Grid item xs={12} md={12}>

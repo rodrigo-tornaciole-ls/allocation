@@ -7,6 +7,7 @@ import deleteProjects from "../../pages/api/projects/delete";
 import { Button } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from 'next/router';
+import deleteAppointment from "../../pages/api/appointments/delete";
 
 interface IGridPros {
     initialColumns: string[][];
@@ -97,6 +98,8 @@ export default function GridTable({initialColumns, initialRows, action}: IGridPr
                 await deleteDeveloper(_id);
             }else if(action==="projects"){
                 await deleteProjects(_id);
+            }else if(action=="appointments"){
+                await deleteAppointment(_id);
             }
           });
         },

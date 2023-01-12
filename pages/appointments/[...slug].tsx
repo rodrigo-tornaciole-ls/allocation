@@ -9,6 +9,8 @@ import stylesHome from '../../styles/Home.module.css';
 import { Alert, Breadcrumbs, Snackbar, Typography } from '@mui/material';
 import getAppointment from '../api/appointments/[pid]';
 import dayjs from 'dayjs';
+import getDeveloper from '../api/developers/[pid]';
+import getProject from '../api/projects/[pid]';
 var weekOfYear = require('dayjs/plugin/weekOfYear')
 
 export default function AppointmentsForm() {
@@ -33,16 +35,19 @@ export default function AppointmentsForm() {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
         const date = event.target.date.value;
-        const weekOfYear = dayjs(date).week()
+        const weekOfYear = dayjs(date).week();
         const year = dayjs(date).year();
+        const user = await getDeveloper(event.target.developer.value);
+        const project = await getProject(event.target.project.value);
         const data = {
             weekOfYear,
             year,
-            user: event.target.developer.value,
-            project: event.target.project.value,
+            date,
+            user,
+            project,
             status: event.target.status.value,
             availability: event.target.availability.value,
-            otherAvailability: event.target.otherAvailability.value,
+            otherAvailability: event.target.otherAvailability?.value || null,
         }
         if(action=="edit"){
             editAppointment(router.query?.slug[1], data).then((project: {_id?: string, message?:string}) => {
